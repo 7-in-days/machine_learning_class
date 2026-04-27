@@ -20,47 +20,47 @@ input_dim = 784
 hidden_dim = 50
 output_dim = 10
 learning_rate = 0.1
-epochs = 30 # 30
+epochs = 200 # 30
 batch_size = 100
 
 
 np.random.seed(42)
 
-# hidden layer 들어가는 파라미터 초기화
-W1 = np.random.randn(input_dim, hidden_dim) * 0.01
-b1 = np.zeros((1, hidden_dim))
+# # hidden layer 들어가는 파라미터 초기화
+# W1 = np.random.randn(input_dim, hidden_dim) * 0.01
+# b1 = np.zeros((1, hidden_dim))
 
-W2= np.random.randn(hidden_dim, hidden_dim) * 0.01 # hidden이랑 output이랑 사이즈 잘 봐야함 안그러면 터짐
-b2 = np.zeros((1, hidden_dim))
+# W2= np.random.randn(hidden_dim, hidden_dim) * 0.01 # hidden이랑 output이랑 사이즈 잘 봐야함 안그러면 터짐
+# b2 = np.zeros((1, hidden_dim))
 
-W3 = np.random.randn(hidden_dim, output_dim) * 0.01
-b3 = np.zeros((1, output_dim))
+# W3 = np.random.randn(hidden_dim, output_dim) * 0.01
+# b3 = np.zeros((1, output_dim))
 
 # activation function
 
-def relu(x):
-    return np.maximum(0, x)
+# def relu(x):
+#     return np.maximum(0, x)
 
-def relu_derivative(x):
-    return (x>0.0).astype(float)
+# def relu_derivative(x):
+#     return (x>0.0).astype(float)
 
-def sigmoid(x):
-    return 1/(1 + np.exp(-x))
+# def sigmoid(x):
+#     return 1/(1 + np.exp(-x))
 
-def sigmoid_deriviate(x):
-    s = sigmoid(x)
-    return s * (1-s)
+# def sigmoid_deriviate(x):
+#     s = sigmoid(x)
+#     return s * (1-s)
 
-# 소프트맥스 정규화
+# # 소프트맥스 정규화
 
-def softmax(x):
-    exp_x = np.exp(x - np.max(x, axis=1, keepdims=True)) 
-    return exp_x / np.sum(exp_x, axis=1, keepdims=True)
+# def softmax(x):
+#     exp_x = np.exp(x - np.max(x, axis=1, keepdims=True)) 
+#     return exp_x / np.sum(exp_x, axis=1, keepdims=True)
 
-# loss function 
+# # loss function 
 
-def cross_entropy(preds, targets):
-    return -np.sum(targets * np.log(preds + 1e-9)) / preds.shape[0]
+# def cross_entropy(preds, targets):
+#     return -np.sum(targets * np.log(preds + 1e-9)) / preds.shape[0]
 
 
 
@@ -81,7 +81,7 @@ class SGD:
 
     def update(self, params, grads):
         for key in params.keys():
-            params[key] -= self.lr * grads[key]
+            params[key] -= self.lr * grads[key] # 기존 경사하강법
 
 class Momentum:
     def __init__(self, lr=0.01, momentum=0.9):
@@ -154,9 +154,6 @@ class Adam:
 
 
 
-
-
-
 optimizers = {}
 optimizers['SGD'] = SGD()
 optimizers['Momentum'] = Momentum()
@@ -172,7 +169,7 @@ accuracy = {}
 
 for key in optimizers.keys():
     networks[key] = MultiLayerNet(input_size=input_dim, hidden_size_list=[hidden_dim, hidden_dim, hidden_dim], output_size=output_dim)
-
+    # 각각 network key에 multilayer 클래스 넣음
     train_loss[key] = []
     accuracy[key] = []
 
@@ -183,12 +180,12 @@ for i in range(epochs):
     t_batch = t_train[batch_mask]
 
     for key in optimizers.keys():
-        grads = networks[key].gradient(x_batch, t_batch)
-        optimizers[key].update(networks[key].params, grads)
+        grads = networks[key].gradient(x_batch, t_batch) # multilayernet 내부에 내장
+        optimizers[key].update(networks[key].params, grads) # key -> optimizer 이름, update는 함수. params는 내장되어 있음(W,b).grads는 경사하강된거
 
-        loss = networks[key].loss(x_batch, t_batch)
+        loss = networks[key].loss(x_batch, t_batch) 
         train_loss[key].append(loss)
-        ac = networks[key].accuracy(x_batch, t_batch)
+        ac = networks[key].accuracy(x_batch, t_batch) 
         accuracy[key].append(ac)
 
 
