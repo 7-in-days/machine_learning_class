@@ -16,6 +16,7 @@ notebooks/
 
 checkpoints/*_training/
 *.png
+!docs/images/*.png
 *.csv
 !docs/*.csv
 
